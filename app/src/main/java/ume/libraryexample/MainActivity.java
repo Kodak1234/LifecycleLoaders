@@ -9,44 +9,37 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class MainActivity extends AppCompatActivity {
+import ume.loaders.LifeCycleLoader;
+import ume.loaders.LoaderActivity;
+
+//Extend from LoaderActivity
+public class MainActivity extends LoaderActivity<Void> {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        //returns a loader with id == 0 if it exist, else one is created
+        LifeCycleLoader loader = getLoader(0,null);
     }
 
+
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+    public LifeCycleLoader<Void> createLifeCycleLoader(int id, Bundle arg) {
+        //return your loader instance here base on the loader id
+        return null;
     }
 
+    //Loader results will be received here
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+    public void onResultReady(Void aVoid, int type) {
+        super.onResultReady(aVoid, type);
+    }
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
+    //Errors that occurs in the loader will be delivered here
+    @Override
+    public void OnError(Exception e) {
+        super.OnError(e);
     }
 }

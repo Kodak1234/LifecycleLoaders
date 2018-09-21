@@ -46,7 +46,7 @@ public abstract class LoaderActivity<D> extends AppCompatActivity implements Loa
 
     @Override
     public LifeCycleLoader<D> createLifeCycleLoader(int key, Bundle arg) {
-        throw new UnsupportedOperationException("not implemented");
+        throw new UnsupportedOperationException("child should implement");
     }
 
     @Override
