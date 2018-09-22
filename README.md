@@ -115,7 +115,7 @@ import android.content.Context;
 import ume.loaders.LifeCycleLoader;
 
 /**
- * Count's from zero to Integer.MAX
+ * Count's from zero to 100
  */
 public class CustomLoader extends LifeCycleLoader&lt;Integer&gt implements Runnable {
     private Thread thread;
@@ -187,6 +187,25 @@ public class CustomLoader extends LifeCycleLoader&lt;Integer&gt implements Runna
 
 </pre>
 
+### Passing extra data from host to loader
+Implement ValueRequest in your host. The same ValueRequest can be used for multiple loaders
+<pre>
+public MyHost implements ValueRequest {
+        Object getValue(int loaderId, int valueId){
+            return the correct value base on the loaderId and valueId;
+        }
+        
+        //override this in your host and call setValueRequest on LoaderInstallInfo object
+        @Override
+        public LoaderInstallInfo getLoaderInfo(int key) {
+            LoaderInstallInfo info = super.getLoaderInfo(key);
+            info.setValueRequest(this)
+            return info;
+        }
+    }
+   
+</pre>
+Inside your loader call   requestValue(valueId). Calling requestValue(valueId) before attachedToHost() or after onReset() will return null.    
 ### LoaderHelper
 If you don't want to extend from LoaderActivity or LoaderFragment use LoaderHelper to implement your own custom activity or fragment.
 Be sure to to pass lifecycle call backs from the host to the LoaderHelper. Also pass state save events to the LoaderHelper.
