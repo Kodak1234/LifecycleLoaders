@@ -29,7 +29,7 @@ import android.widget.TextView;
 import ume.loaders.LifeCycleLoader;
 import ume.loaders.LoaderActivity;
 
-public class MainActivity extends LoaderActivity<Integer> {
+public class MainActivity extends LoaderActivity&lt;Integer&gt; {
     private TextView text;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +76,7 @@ import android.util.Log;
 import ume.loaders.LifeCycleLoader;
 import ume.loaders.LoaderFragment;
 
-public class MainFragment extends LoaderFragment<Integer> {
+public class MainFragment extends LoaderFragment&lt;Integer&gt; {
     private static final String TAG = "MainFragment";
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -117,7 +117,7 @@ import ume.loaders.LifeCycleLoader;
 /**
  * Count's from zero to Integer.MAX
  */
-public class CustomLoader extends LifeCycleLoader<Integer> implements Runnable {
+public class CustomLoader extends LifeCycleLoader&lt;Integer&gt implements Runnable {
     private Thread thread;
 
     public CustomLoader() {
