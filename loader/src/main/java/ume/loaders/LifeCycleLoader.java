@@ -98,6 +98,9 @@ public abstract class LifeCycleLoader<D> {
         if (callback == null) return;
         Result result;
         synchronized (this) {
+            //deliverResultInternal posted in the handler executed
+            //after onStart has delivered all result
+            if (!hasPendingResult()) return;
             result = results.remove(0);
         }
         if (result.error != null)
