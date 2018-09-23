@@ -15,7 +15,7 @@ android {
 
 dependencies {
     ...
-    implementation 'com.github.Kodak1234:LifecycleLoaders:1.0.2'
+    implementation 'com.github.Kodak1234:LifecycleLoaders:1.0.3'
 }
 
 </pre>
@@ -57,8 +57,8 @@ public class MainActivity extends LoaderActivity&lt;Integer&gt; {
 
     //Errors that occurs in the loader will be delivered here
     @Override
-    public void OnError(Exception e) {
-        super.OnError(e);
+    public void OnError(Exception e,int id) {
+        super.OnError(e,id);
         text.setText("Exception message: ");
         text.append(e.getMessage());
     }
@@ -99,7 +99,7 @@ public class MainFragment extends LoaderFragment&lt;Integer&gt; {
 
     //loader errors will be delivered here
     @Override
-    public void OnError(Exception e) {
+    public void OnError(Exception e,int id) {
         Log.d(TAG, "OnError() called with: e = [" + e + "]");
     }
 }
@@ -180,7 +180,7 @@ public class CustomLoader extends LifeCycleLoader&lt;Integer&gt implements Runna
         } catch (InterruptedException e) {
             //pass error to host. host will receive it if it i started
             //else the error will be queued and delivered when the host starts
-            deliverError(e);
+            deliverError(e,0);
         }
     }
 }
