@@ -1,6 +1,7 @@
 package ume.libraryexample;
 
 import android.content.Context;
+import android.util.Log;
 
 import ume.loaders.LifeCycleLoader;
 
@@ -9,6 +10,7 @@ import ume.loaders.LifeCycleLoader;
  */
 public class CustomLoader extends LifeCycleLoader<Integer> implements Runnable {
     private Thread thread;
+    private static final String TAG = "CustomLoader";
 
     public CustomLoader() {
         //loader is only created once per host
@@ -23,6 +25,7 @@ public class CustomLoader extends LifeCycleLoader<Integer> implements Runnable {
         super.attachedToHost();
         //it is safe to call getContext here
         Context context = getContext();
+        Log.i(TAG, "attachedToHost: "+requestValue(0));
     }
 
     //host has started

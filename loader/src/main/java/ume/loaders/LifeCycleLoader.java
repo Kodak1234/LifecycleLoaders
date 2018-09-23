@@ -104,7 +104,7 @@ public abstract class LifeCycleLoader<D> {
             result = results.remove(0);
         }
         if (result.error != null)
-            callback.OnError(result.error);
+            callback.OnError(result.error, result.type);
         else
             callback.onResultReady(result.result, result.type);
     }
@@ -123,9 +123,9 @@ public abstract class LifeCycleLoader<D> {
     }
 
     @CallSuper
-    protected void deliverError(final Exception e) {
+    protected void deliverError(final Exception e, int t) {
         synchronized (this) {
-            results.add(new Result(e));
+            results.add(new Result(e, t));
         }
         if (isStopped()) return;
         if (isMainThread())
@@ -181,9 +181,9 @@ public abstract class LifeCycleLoader<D> {
 
         LifeCycleLoader<D> createLifeCycleLoader(int key, Bundle arg);
 
-        void onResultReady(D d, int type);
+        void onResultReady(D d, int id);
 
-        void OnError(Exception e);
+        void OnError(Exception e, int id);
     }
 
     private class Result {
@@ -196,8 +196,9 @@ public abstract class LifeCycleLoader<D> {
             this.type = type;
         }
 
-        Result(Exception error) {
+        Result(Exception error, int type) {
             this.error = error;
+            this.type = type;
         }
     }
 }

@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.util.Log;
 
 import ume.loaders.LifeCycleLoader;
+import ume.loaders.LifeCycleLoaderManager;
+import ume.loaders.LifeCycleLoaderManager.LoaderInstallInfo;
 import ume.loaders.LoaderFragment;
 
 public class MainFragment extends LoaderFragment<Integer> {

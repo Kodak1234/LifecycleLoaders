@@ -57,7 +57,7 @@ public abstract class LoaderFragment<D> extends Fragment implements LoaderInstal
     }
 
     @Override
-    public void OnError(Exception e) {
+    public void OnError(Exception e, int type) {
 
     }
 

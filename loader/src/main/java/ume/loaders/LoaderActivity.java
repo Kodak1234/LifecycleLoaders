@@ -55,7 +55,7 @@ public abstract class LoaderActivity<D> extends AppCompatActivity implements Loa
     }
 
     @Override
-    public void OnError(Exception e) {
+    public void OnError(Exception e, int type) {
 
     }
 
