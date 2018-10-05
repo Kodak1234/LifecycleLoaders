@@ -3,12 +3,13 @@ package ume.loaders;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatDialogFragment;
 
+import ume.loaders.LifeCycleLoader.LoaderResultCallback;
 import ume.loaders.LifeCycleLoaderManager.LoaderInstallCallback;
 
-public abstract class DialogLoaderFragment<D> extends Fragment implements LoaderInstallCallback,
-        LifeCycleLoader.LoaderResultCallback<D> {
+public abstract class DialogLoaderFragment<D> extends AppCompatDialogFragment implements LoaderInstallCallback,
+        LoaderResultCallback<D> {
 
     private LoaderHelper loaderHelper;
 
