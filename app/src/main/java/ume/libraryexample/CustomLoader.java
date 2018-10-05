@@ -73,7 +73,7 @@ public class CustomLoader extends LifeCycleLoader<Integer> implements Runnable {
         } catch (InterruptedException e) {
             //pass error to host. host will receive it if it i started
             //else the error will be queued and delivered when the host starts
-            deliverError(e);
+            deliverError(e,0);
         }
     }
 }

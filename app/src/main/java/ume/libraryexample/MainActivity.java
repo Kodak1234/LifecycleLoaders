@@ -34,8 +34,8 @@ public class MainActivity extends LoaderActivity<Integer> {
 
     //Errors that occurs in the loader will be delivered here
     @Override
-    public void OnError(Exception e) {
-        super.OnError(e);
+    public void OnError(Exception e,int id) {
+        super.OnError(e,id);
         text.setText("Exception message: ");
         text.append(e.getMessage());
     }

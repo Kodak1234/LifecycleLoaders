@@ -26,12 +26,14 @@ public class MainFragment extends LoaderFragment<Integer> {
     //loader result will be delivered here
     @Override
     public void onResultReady(Integer integer, int i) {
+        super.onResultReady(integer, i);
         Log.d(TAG, "onResultReady() called with: integer = [" + integer + "], i = [" + i + "]");
     }
 
     //loader errors will be delivered here
     @Override
-    public void OnError(Exception e) {
+    public void OnError(Exception e,int id) {
+        super.OnError(e,id);
         Log.d(TAG, "OnError() called with: e = [" + e + "]");
     }
 }
