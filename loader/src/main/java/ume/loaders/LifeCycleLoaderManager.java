@@ -2,7 +2,7 @@ package ume.loaders;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.UiThread;
+import androidx.annotation.UiThread;
 import android.util.SparseArray;
 
 import ume.loaders.LifeCycleLoader.LoaderResultCallback;
