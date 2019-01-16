@@ -5,13 +5,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+
 import androidx.annotation.CallSuper;
 import androidx.annotation.UiThread;
 import androidx.fragment.app.Fragment;
-import android.util.Log;
-
-import java.util.ArrayList;
-
 import ume.loaders.LifeCycleLoaderManager.LoaderInstallInfo;
 
 import static android.os.Looper.getMainLooper;
@@ -25,12 +22,12 @@ public abstract class LifeCycleLoader<D> {
     private LoaderInstallInfo info;
     private int id;
     private Handler handler;
-    private ArrayList<Result> results;
+    private LifeCycleLoader.DataStream<D> stream;
 
     @UiThread
-    public LifeCycleLoader() {
+    public LifeCycleLoader(DataStream<D> stream) {
+        this.stream = stream;
         handler = new Handler();
-        results = new ArrayList<>();
     }
 
     static boolean isExiting(Activity activity) {
@@ -56,7 +53,7 @@ public abstract class LifeCycleLoader<D> {
     protected void onStart() {
         stopped = false;
         synchronized (this) {
-            while (hasPendingResult()) deliverResultInternal();
+            while (hasPendingData()) dispatch();
         }
     }
 
@@ -93,48 +90,43 @@ public abstract class LifeCycleLoader<D> {
         return currentThread().equals(getMainLooper().getThread());
     }
 
-    private void deliverResultInternal() {
+    private void dispatch() {
         LoaderResultCallback<D> callback = getCallback();
-        if (callback == null) return;
-        Result result;
-        synchronized (this) {
-            //deliverResultInternal posted in the handler executed
-            //after onStart has delivered all result
-            if (!hasPendingResult()) return;
-            result = results.remove(0);
+        if (callback != null) {
+            synchronized (this) {
+                if (hasPendingData())
+                    stream.dispatch(callback);
+            }
         }
-        if (result.error != null)
-            callback.OnError(result.error, result.type);
-        else
-            callback.onResultReady(result.result, result.type);
     }
 
     @CallSuper
     protected void deliverResult(final D d, final int t) {
         synchronized (this) {
-            results.add(new Result(d, t));
+            stream.onData(d, t);
+            //results.add(new Result(d, t));
         }
-        if (isStopped()) return;
-        //current thread is ui thread, deliver result immediately
-        if (isMainThread())
-            deliverResultInternal();
-        else
-            handler.post(this::deliverResultInternal);
+        if (!isStopped() && hasPendingData()) {
+            //current thread is ui thread, deliver result immediately
+            if (isMainThread())
+                dispatch();
+            else
+                handler.post(this::dispatch);
+        }
     }
 
     @CallSuper
     protected void deliverError(final Exception e, int t) {
         synchronized (this) {
-            results.add(new Result(e, t));
+            //results.add(new Result(e, t));
+            stream.onError(e, t);
         }
-        if (isStopped()) return;
-        if (isMainThread())
-            deliverResultInternal();
-        else
-            handler.post(this::deliverResultInternal);
-        if (e != null) {
-            e.printStackTrace();
-            Log.e(TAG, "deliverError: " + getClass().getSimpleName());
+
+        if (!isStopped() && hasPendingData()) {
+            if (isMainThread())
+                dispatch();
+            else
+                handler.post(this::dispatch);
         }
     }
 
@@ -146,8 +138,8 @@ public abstract class LifeCycleLoader<D> {
                 .getValue(getId(), valueId);
     }
 
-    private synchronized boolean hasPendingResult() {
-        return !results.isEmpty();
+    private synchronized boolean hasPendingData() {
+        return stream.hasData();
     }
 
     public final boolean isDetached() {
@@ -177,6 +169,39 @@ public abstract class LifeCycleLoader<D> {
         Object getValue(int loaderId, int valueId);
     }
 
+    public interface DataStream<D> {
+        /**
+         * Return true if there is data available to be delivered
+         *
+         * @return true if data is available
+         */
+        boolean hasData();
+
+        /**
+         * Store data
+         *
+         * @param d  Data
+         * @param id data identifier
+         */
+        void onData(D d, int id);
+
+        /**
+         * Store error. This error should be wrapped in data
+         * D and returned when DataStream#next is called
+         *
+         * @param e  Error
+         * @param id identifier
+         */
+        void onError(Exception e, int id);
+
+        /**
+         * Dispatch pending data to the host
+         *
+         * @param callback LoaderResultCallback
+         */
+        void dispatch(LoaderResultCallback<D> callback);
+    }
+
     public interface LoaderResultCallback<D> {
 
         LifeCycleLoader<D> createLifeCycleLoader(int key, Bundle arg);
@@ -184,21 +209,5 @@ public abstract class LifeCycleLoader<D> {
         void onResultReady(D d, int id);
 
         void OnError(Exception e, int id);
-    }
-
-    private class Result {
-        D result;
-        int type;
-        Exception error;
-
-        Result(D result, int type) {
-            this.result = result;
-            this.type = type;
-        }
-
-        Result(Exception error, int type) {
-            this.error = error;
-            this.type = type;
-        }
     }
 }
