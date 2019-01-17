@@ -2,13 +2,13 @@ package ume.streams;
 
 import java.util.LinkedList;
 
-import ume.loaders.LifeCycleLoader.DataStream;
+import ume.loaders.LifeCycleLoader.DataStore;
 import ume.loaders.LifeCycleLoader.LoaderResultCallback;
 
-public class QueueDataStream<D> implements DataStream<D> {
+public class StreamDataStore<D> implements DataStore<D> {
     private LinkedList<Result> data;
 
-    public QueueDataStream() {
+    public StreamDataStore() {
         data = new LinkedList<>();
     }
 
@@ -18,12 +18,12 @@ public class QueueDataStream<D> implements DataStream<D> {
     }
 
     @Override
-    public void onData(D d, int id) {
+    public void store(D d, int id) {
         data.add(new Result(d, id));
     }
 
     @Override
-    public void onError(Exception e, int id) {
+    public void store(Exception e, int id) {
         data.add(new Result(e, id));
     }
 

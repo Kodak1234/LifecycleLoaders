@@ -10,6 +10,7 @@ import androidx.annotation.CallSuper;
 import androidx.annotation.UiThread;
 import androidx.fragment.app.Fragment;
 import ume.loaders.LifeCycleLoaderManager.LoaderInstallInfo;
+import ume.streams.StreamDataStore;
 
 import static android.os.Looper.getMainLooper;
 import static java.lang.Thread.currentThread;
@@ -22,11 +23,16 @@ public abstract class LifeCycleLoader<D> {
     private LoaderInstallInfo info;
     private int id;
     private Handler handler;
-    private LifeCycleLoader.DataStream<D> stream;
+    private DataStore<D> store;
 
     @UiThread
-    public LifeCycleLoader(DataStream<D> stream) {
-        this.stream = stream;
+    public LifeCycleLoader() {
+        this(new StreamDataStore<>());
+    }
+
+    @UiThread
+    public LifeCycleLoader(DataStore<D> store) {
+        this.store = store;
         handler = new Handler();
     }
 
@@ -95,7 +101,7 @@ public abstract class LifeCycleLoader<D> {
         if (callback != null) {
             synchronized (this) {
                 if (hasPendingData())
-                    stream.dispatch(callback);
+                    store.dispatch(callback);
             }
         }
     }
@@ -103,8 +109,7 @@ public abstract class LifeCycleLoader<D> {
     @CallSuper
     protected void deliverResult(final D d, final int t) {
         synchronized (this) {
-            stream.onData(d, t);
-            //results.add(new Result(d, t));
+            store.store(d, t);
         }
         if (!isStopped() && hasPendingData()) {
             //current thread is ui thread, deliver result immediately
@@ -118,8 +123,7 @@ public abstract class LifeCycleLoader<D> {
     @CallSuper
     protected void deliverError(final Exception e, int t) {
         synchronized (this) {
-            //results.add(new Result(e, t));
-            stream.onError(e, t);
+            store.store(e, t);
         }
 
         if (!isStopped() && hasPendingData()) {
@@ -139,7 +143,7 @@ public abstract class LifeCycleLoader<D> {
     }
 
     private synchronized boolean hasPendingData() {
-        return stream.hasData();
+        return store.hasData();
     }
 
     public final boolean isDetached() {
@@ -169,7 +173,7 @@ public abstract class LifeCycleLoader<D> {
         Object getValue(int loaderId, int valueId);
     }
 
-    public interface DataStream<D> {
+    public interface DataStore<D> {
         /**
          * Return true if there is data available to be delivered
          *
@@ -183,7 +187,7 @@ public abstract class LifeCycleLoader<D> {
          * @param d  Data
          * @param id data identifier
          */
-        void onData(D d, int id);
+        void store(D d, int id);
 
         /**
          * Store error. This error should be wrapped in data
@@ -192,7 +196,7 @@ public abstract class LifeCycleLoader<D> {
          * @param e  Error
          * @param id identifier
          */
-        void onError(Exception e, int id);
+        void store(Exception e, int id);
 
         /**
          * Dispatch pending data to the host

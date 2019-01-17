@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import ume.loaders.LifeCycleLoader;
+import ume.streams.QueueDataStream;
 
 /**
  * Count's from zero to Integer.MAX
@@ -13,6 +14,7 @@ public class CustomLoader extends LifeCycleLoader<Integer> implements Runnable {
     private static final String TAG = "CustomLoader";
 
     public CustomLoader() {
+        super(new QueueDataStream<>());
         //loader is only created once per host
         thread = new Thread(this, "LoaderThread");
         thread.start();
